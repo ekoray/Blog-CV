@@ -126,7 +126,7 @@ def admin_only(f):
 def get_all_posts():
     posts = BlogPost.query.all()
     return render_template("index.html", all_posts=posts, logged_in=current_user.is_authenticated,
-                           user_id=current_user.get_id())
+                           user_id=current_user.get_id(), this_year=date.today().year)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -154,7 +154,8 @@ def register():
             flash("You have already registered. Just log in.")
             return redirect(url_for('login'))
 
-    return render_template("register.html", form=form, logged_in=current_user.is_authenticated)
+    return render_template("register.html", form=form, logged_in=current_user.is_authenticated,
+                           this_year=date.today().year)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -180,7 +181,7 @@ def login():
             return redirect(url_for('login'))
 
     return render_template("login.html", form=form, logged_in=current_user.is_authenticated,
-                           user_id=current_user.get_id())
+                           user_id=current_user.get_id(), this_year=date.today().year)
 
 
 @app.route('/logout')
@@ -209,12 +210,12 @@ def show_post(post_id):
             return redirect(url_for('login'))
 
     return render_template("post.html", post=requested_post, logged_in=current_user.is_authenticated,
-                           user_id=current_user.get_id(), form=comment_form)
+                           user_id=current_user.get_id(), form=comment_form, this_year=date.today().year)
 
 
 @app.route("/about")
 def about():
-    return render_template("about.html", logged_in=current_user.is_authenticated)
+    return render_template("about.html", logged_in=current_user.is_authenticated, this_year=date.today().year)
 
 
 @app.route("/contact", methods=['GET', 'POST'])
@@ -235,7 +236,7 @@ def contact():
                     f"Email: {user_email}\n\n Phone number: {user_phone} \n\n Message: {user_message}".encode("utf-8"))
 
         return redirect(url_for('contact'))
-    return render_template("contact.html", logged_in=current_user.is_authenticated)
+    return render_template("contact.html", logged_in=current_user.is_authenticated, this_year=date.today().year)
 
 
 @app.route("/new-post", methods=['GET', 'POST'])
@@ -254,7 +255,8 @@ def add_new_post():
         db.session.add(new_post)
         db.session.commit()
         return redirect(url_for("get_all_posts"))
-    return render_template("make-post.html", form=form, logged_in=current_user.is_authenticated)
+    return render_template("make-post.html", form=form, logged_in=current_user.is_authenticated,
+                           this_year=date.today().year)
 
 
 @app.route("/edit-post/<int:post_id>", methods=['GET', 'POST'])
@@ -276,7 +278,8 @@ def edit_post(post_id):
         db.session.commit()
         return redirect(url_for("show_post", post_id=post.id))
 
-    return render_template("make-post.html", form=edit_form, is_edit=True, logged_in=current_user.is_authenticated)
+    return render_template("make-post.html", form=edit_form, is_edit=True, logged_in=current_user.is_authenticated,
+                           this_year=date.today().year)
 
 
 @app.route("/delete/<int:post_id>")
