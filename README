@@ -10,3 +10,4 @@ Frameworks and libraries used:
  - Flask-WTF
  - Flask-Bootstrap
  - Flask-Login
+ - smtplib
