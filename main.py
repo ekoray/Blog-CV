@@ -1,12 +1,13 @@
 import os
+import smtplib
 from functools import wraps
-from flask import Flask, render_template, redirect, url_for, flash, abort
+from flask import Flask, render_template, redirect, url_for, flash, abort, request
 from flask_bootstrap import Bootstrap
 from flask_ckeditor import CKEditor
 from datetime import date
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import relationship, DeclarativeBase, mapped_column
+from sqlalchemy.orm import relationship, mapped_column
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
 from flask_gravatar import Gravatar
@@ -26,10 +27,14 @@ gravatar = Gravatar(app, size=100,
                     use_ssl=False,
                     base_url=None)
 
-# CONNECT TO DB
+MY_EMAIL = os.environ.get('MY_EMAIL')
+# MY_EMAIL = "koraytestingen@gmail.com"
+MY_PASSWORD = os.environ.get('MY_PASSWORD')
+# MY_PASSWORD = "ipoetgodrogebqmr"
+MY_EMAIL_OFFICIAL = os.environ.get('MY_EMAIL_OFFICIAL')
+# MY_EMAIL_OFFICIAL = "korayerkan@gmail.com"
 
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
-#     os.path.join(basedir, 'blog.db')
+# CONNECT TO DB
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('POSTGRE_DATABASE_URL', 'sqlite:///blog.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -139,7 +144,7 @@ def register():
                 form.password.data, "pbkdf2:sha256", salt_length=8)
             user_name = form.name.data
 
-            new_user = User( name=user_name, email=user_email, password=user_pass)
+            new_user = User(name=user_name, email=user_email, password=user_pass)
             db.session.add(new_user)
             db.session.commit()
 
@@ -212,8 +217,24 @@ def about():
     return render_template("about.html", logged_in=current_user.is_authenticated)
 
 
-@app.route("/contact")
+@app.route("/contact", methods=['GET', 'POST'])
 def contact():
+    if request.method == 'POST':
+        user_name = request.form.get('name')
+        user_email = request.form.get('email')
+        user_phone = request.form.get('phone')
+        user_message = request.form.get('message')
+
+        with smtplib.SMTP('smtp.gmail.com', port=587) as connection:
+            connection.starttls()
+            connection.login(user=MY_EMAIL, password=MY_PASSWORD)
+            connection.sendmail(
+                from_addr=MY_EMAIL,
+                to_addrs=MY_EMAIL_OFFICIAL,
+                msg=f"Subject: Message from Website! \n\n Name: {user_name} \n\n"
+                    f"Email: {user_email}\n\n Phone number: {user_phone} \n\n Message: {user_message}".encode("utf-8"))
+
+        return redirect(url_for('contact'))
     return render_template("contact.html", logged_in=current_user.is_authenticated)
 
 
