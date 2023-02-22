@@ -1,0 +1,10 @@
+This is a blog-cv website created by me, to exhibit my professional experience while practicing frontend (HTML, CSS) and backend (Python) technologies.
+Doing is the key to understanding I believe, so instead of creating a CV with Word, I wanted to create my own cv-like website and understand how frontend and backend works together.
+
+Frameworks and libraries used:
+
+ - Flask
+ - Flask-SQLAlchemy
+ - Flask-WTF
+ - Flask-Bootstrap
+ - Flask-Login
